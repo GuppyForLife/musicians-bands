@@ -38,6 +38,7 @@ describe('Band and Musician Models', () => {
         - I've left it here for you to see how to go about testing associations 
     */
 
+    /*
     test('Band can have many Musicians', async () => {
         await sequelize.sync({ force: true }); // recreate db
         let BigBang = await Band.create({ name: 'BIGBANG', genre: 'KPOP' }); //create band
@@ -51,5 +52,6 @@ describe('Band and Musician Models', () => {
     
         expect(musicians.length).toBe(2); //we've added two musicians, so the length should be two
         expect(musicians[0] instanceof Musician).toBeTruthy; //checks that the value at index 0 of the list - a musician object, is in fact a musician object
-      });
-})
+      })
+    */
+});
