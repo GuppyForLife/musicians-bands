@@ -30,7 +30,7 @@ describe('Band and Musician Models', () => {
          * Create a new instance of a musician using the Musician Model
          *  Check to see if the name or intrument passed into the object is infact the correct on the new instance
          **/
-        const musician = await Musician.create({ name:'John Lennon', instrument:'Guitar'})
+        const musician = await Musician.create({ name:'John Lennon', instrument:'Guitar'});
         expect(musician.instrument).toBe('Guitar');
         expect(musician.name).toBe('John Lennon');
     })
@@ -82,4 +82,24 @@ describe('Band and Musician Models', () => {
         expect(beatlesSongs[0].year).toEqual(1968);
     })
 
+    test('Eager loading data', async () => {
+        await sequelize.sync({ force: true });
+        const beatles = await Band.create({ name: 'The Beatles', genre: 'Rock' });
+        const heyJude = await Song.create({title: 'Hey Jude', year: 1968});
+        const musician = await Musician.create({ name:'John Lennon', instrument:'Guitar'});
+        await beatles.addMusician(musician);
+        await beatles.addSong(heyJude);
+
+        const bands = await Band.findAll({
+            include :[
+                { model: Musician, as: 'musicians'},
+                { model: Song, as: 'songs'}
+            ]
+        });
+
+        expect(bands[0].musicians[0].name).toBe('John Lennon');
+        expect(bands[0].musicians[0].instrument).toBe('Guitar');
+        expect(bands[0].songs[0].title).toBe('Hey Jude');
+        expect(bands[0].songs[0].year).toBe(1968);
+    })
 });
