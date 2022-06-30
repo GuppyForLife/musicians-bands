@@ -31,13 +31,6 @@ describe('Band and Musician Models', () => {
         const musician = await Musician.create({ name:'John Lennon', instrument:'Guitar'})
         expect(musician.instrument).toBe('Guitar');
     })
-
-    /*
-     * Optional test to show associations:
-        - I've completed this test for you
-        - I've left it here for you to see how to go about testing associations 
-    */
-
     
     test('Band can have many Musicians', async () => {
         await sequelize.sync({ force: true }); // recreate db
