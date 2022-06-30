@@ -1,5 +1,6 @@
 const {sequelize} = require('./db');
-const {Band, Musician} = require('./index')
+const {Band, Musician} = require('./index');
+const { Song } = require('./Song');
 
 describe('Band and Musician Models', () => {
     /**
@@ -20,6 +21,7 @@ describe('Band and Musician Models', () => {
          **/
         const band = await Band.create({ name: 'The Beatles', genre: 'Rock'})
         expect(band.name).toBe('The Beatles');
+        expect(band.genre).toBe('Rock');
     })
 
     test('can create a Musician', async () => {
@@ -30,6 +32,7 @@ describe('Band and Musician Models', () => {
          **/
         const musician = await Musician.create({ name:'John Lennon', instrument:'Guitar'})
         expect(musician.instrument).toBe('Guitar');
+        expect(musician.name).toBe('John Lennon');
     })
     
     test('Band can have many Musicians', async () => {
@@ -45,5 +48,38 @@ describe('Band and Musician Models', () => {
     
         expect(musicians.length).toBe(2); //we've added two musicians, so the length should be two
         expect(musicians[0] instanceof Musician).toBeTruthy; //checks that the value at index 0 of the list - a musician object, is in fact a musician object
-      })
+    })
+
+    test('can create a Song', async () => {
+        const song = await Song.create({title: 'Hey Jude', year: 1968});
+        expect(song.title).toEqual('Hey Jude');
+        expect(song.year).toEqual(1968);
+    })
+
+    test('Bands have many Songs and Songs have many Bands', async () => {
+        await sequelize.sync({ force: true });
+        const beatles = await Band.create({ name: 'The Beatles', genre: 'Rock' });
+        const bigBang = await Band.create({ name: 'BIGBANG', genre: 'KPOP' });
+        const heyJude = await Song.create({title: 'Hey Jude', year: 1968});
+        const stillLife = await Song.create({title: 'Still Life', year: 2022});
+
+        await bigBang.addSong(stillLife);
+        await bigBang.addSong(heyJude);
+        const bigBangsongs = await bigBang.getSongs();
+        expect(bigBangsongs.length).toEqual(2);
+        expect(bigBangsongs[1].title).toEqual('Still Life');
+        expect(bigBangsongs[0].title).toEqual('Hey Jude');
+        expect(bigBangsongs[1].year).toEqual(2022);
+        expect(bigBangsongs[0].year).toEqual(1968);
+
+        await beatles.addSong(stillLife);
+        await beatles.addSong(heyJude);
+        const beatlesSongs = await bigBang.getSongs();
+        expect(beatlesSongs.length).toEqual(2);
+        expect(beatlesSongs[1].title).toEqual('Still Life');
+        expect(beatlesSongs[0].title).toEqual('Hey Jude');
+        expect(beatlesSongs[1].year).toEqual(2022);
+        expect(beatlesSongs[0].year).toEqual(1968);
+    })
+
 });
